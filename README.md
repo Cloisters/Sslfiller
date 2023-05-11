@@ -29,7 +29,7 @@ This script requires Python 3 and the termcolor, ssl, socket. To install require
 # Usage
 Run the script and enter the domain name when prompted:
 
-`python SslFiller.py`
+`python SslFiller`
 
 # Note
 • This script is developed by Entity.Network.
