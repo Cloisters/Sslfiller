@@ -1,3 +1,4 @@
+#!/bin/python
 import ssl
 import socket
 from termcolor import colored
