@@ -1,0 +1,57 @@
+import ssl
+import socket
+from termcolor import colored
+a = '''
+ 8""""8             8""""                            
+8      eeeee e     8     e  e     e     eeee eeeee  
+8eeeee 8   " 8     8eeee 8  8     8     8    8   8  
+    88 8eeee 8e    88    8e 8e    8e    8eee 8eee8e 
+e   88    88 88    88    88 88    88    88   88   8 
+8eee88 8ee88 88eee 88    88 88eee 88eee 88ee 88   8 
+                                                    
+                      Developed by Entity.Network                _________________________________________________________ 
+'''
+print (colored(a, 'blue'))
+hostname = input(colored("Enter domain name: ", 'cyan'))
+ctx = ssl.create_default_context()
+s = ctx.wrap_socket(socket.socket(), server_hostname=hostname)
+s.connect((hostname, 443))
+cert = s.getpeercert()
+subject = dict(x[0] for x in cert['subject'])
+issued_to = subject['commonName']
+issued_by = dict(x[0] for x in cert['issuer'])['commonName']
+not_before = cert['notBefore']
+not_after = cert['notAfter']
+serial_number = cert['serialNumber']
+ssl_version = s.version()
+
+print(colored(f"SSL version: {ssl_version}", "green"))
+print(colored(f"Certificate issued to: {issued_to}", "green"))
+print(colored(f"Certificate issued by: {issued_by}", "green"))
+print(colored(f"Serial number: {serial_number}", "green"))
+print(colored(f"Valid from: {not_before}", "green"))
+print(colored(f"Valid until: {not_after}", "green"))
+
+if ssl_version == "TLSv1.0":
+    print(colored("This SSL version is vulnerable to POODLE attacks.", "red"))
+elif ssl_version == "TLSv1.1":
+    print(colored("This SSL version is vulnerable to BEAST attacks.", "red"))
+elif ssl_version == "TLSv1.2":
+    print(colored("This SSL version is not vulnerable to known attacks.", "green"))
+else:
+    print(colored("This SSL version is not supported.", "red"))
+
+if 'RC4' in str(cert):
+    print(colored("This certificate uses RC4 cipher which is not secure for use in HTTPS.", "red"))
+
+if 'DES-CBC3-SHA' in str(cert):
+    print(colored("This certificate uses 3DES cipher which is not secure for use in HTTPS.", "red"))
+
+if 'MD5' in str(cert):
+    print(colored("This certificate uses MD5 hash which is not secure for use in HTTPS.", "red"))
+
+if 'SHA-1' in str(cert):
+    print(colored("This certificate uses SHA-1 hash which is not secure for use in HTTPS.", "red"))
+
+if 'SHA-2' not in str(cert):
+    print(colored("This certificate does not use SHA-2 hash which is recommended for use in HTTPS.", "yellow"))
